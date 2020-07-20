@@ -1,0 +1,3 @@
+[submodule "riscv/rtl/AESCore"]
+	path = riscv/rtl/AESCore
+	url = https://github.com/Alenkruth/AESCore
