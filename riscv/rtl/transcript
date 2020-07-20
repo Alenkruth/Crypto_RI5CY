@@ -1,0 +1,158 @@
+# //  Questa Sim-64
+# //  Version 2020.2 linux_x86_64 Apr 19 2020
+# //
+# //  Copyright 1991-2020 Mentor Graphics Corporation
+# //  All Rights Reserved.
+# //
+# //  QuestaSim and its associated documentation contain trade
+# //  secrets and commercial or financial information that are the property of
+# //  Mentor Graphics Corporation and are privileged, confidential,
+# //  and exempt from disclosure under the Freedom of Information Act,
+# //  5 U.S.C. Section 552. Furthermore, this information
+# //  is prohibited from disclosure under the Trade Secrets Act,
+# //  18 U.S.C. Section 1905.
+# //
+project open /home/user/Documents/RV_ISA/Questa/AES_Sim
+# Loading project AES_Sim
+# Compile of AddRoundKey.sv was successful.
+# Compile of AESStages.sv was successful.
+# Compile of affineTrans.sv was successful.
+# Compile of FunctionF.sv was successful.
+# Compile of FunctionG.sv was successful.
+# Compile of FunctionGXOR.sv was successful.
+# Compile of Inverse.sv was successful.
+# Compile of KeySchedule.sv was successful with warnings.
+# Compile of MixColumn.sv was successful.
+# Compile of Multiplier.sv was successful.
+# Compile of Multiplier_e.sv was successful.
+# Compile of ShiftRows.sv was successful.
+# Compile of Squarer.sv was successful.
+# Compile of SubByte.sv was successful.
+# Compile of SubByte16.sv was successful.
+# Compile of Sum.sv was successful.
+# Compile of XORkey.sv was successful.
+# Compile of AESTopTest.sv was successful.
+# Compile of AESTop.sv was successful.
+# 19 compiles, 0 failed with no errors.
+# Load canceled
+vsim work.AESTopTest -novopt -suppress 12110
+# vsim work.AESTopTest -novopt -suppress 12110 
+# Start time: 17:37:34 on Jul 20,2020
+# ** Warning: (vsim-8891) All optimizations are disabled because the -novopt option is in effect. This will cause your simulation to run very slowly. If you are using this switch to preserve visibility for Debug or PLI features, please see the User's Manual section on Preserving Object Visibility with vopt. -novopt option is now deprecated and will be removed in future releases.
+# Refreshing /home/user/Documents/RV_ISA/Questa/work.AESTopTest
+# ** Warning: (vlog-8891) All optimizations are disabled because the -novopt option is in effect. This will cause your simulation to run very slowly. If you are using this switch to preserve visibility for Debug or PLI features, please see the User's Manual section on Preserving Object Visibility with vopt. -novopt option is now deprecated and will be removed in future releases.
+# Loading sv_std.std
+# Loading work.AESTopTest
+# Refreshing /home/user/Documents/RV_ISA/Questa/work.AESTop
+# ** Warning: (vlog-8891) All optimizations are disabled because the -novopt option is in effect. This will cause your simulation to run very slowly. If you are using this switch to preserve visibility for Debug or PLI features, please see the User's Manual section on Preserving Object Visibility with vopt. -novopt option is now deprecated and will be removed in future releases.
+# Loading work.AESTop
+# Refreshing /home/user/Documents/RV_ISA/Questa/work.AESStages
+# ** Warning: (vlog-8891) All optimizations are disabled because the -novopt option is in effect. This will cause your simulation to run very slowly. If you are using this switch to preserve visibility for Debug or PLI features, please see the User's Manual section on Preserving Object Visibility with vopt. -novopt option is now deprecated and will be removed in future releases.
+# Loading work.AESStages
+# Refreshing /home/user/Documents/RV_ISA/Questa/work.SubByte16
+# ** Warning: (vlog-8891) All optimizations are disabled because the -novopt option is in effect. This will cause your simulation to run very slowly. If you are using this switch to preserve visibility for Debug or PLI features, please see the User's Manual section on Preserving Object Visibility with vopt. -novopt option is now deprecated and will be removed in future releases.
+# Loading work.SubByte16
+# Refreshing /home/user/Documents/RV_ISA/Questa/work.SubByte
+# ** Warning: (vlog-8891) All optimizations are disabled because the -novopt option is in effect. This will cause your simulation to run very slowly. If you are using this switch to preserve visibility for Debug or PLI features, please see the User's Manual section on Preserving Object Visibility with vopt. -novopt option is now deprecated and will be removed in future releases.
+# Loading work.SubByte
+# Refreshing /home/user/Documents/RV_ISA/Questa/work.Squarer
+# ** Warning: (vlog-8891) All optimizations are disabled because the -novopt option is in effect. This will cause your simulation to run very slowly. If you are using this switch to preserve visibility for Debug or PLI features, please see the User's Manual section on Preserving Object Visibility with vopt. -novopt option is now deprecated and will be removed in future releases.
+# Loading work.Squarer
+# Refreshing /home/user/Documents/RV_ISA/Questa/work.Multiplier
+# ** Warning: (vlog-8891) All optimizations are disabled because the -novopt option is in effect. This will cause your simulation to run very slowly. If you are using this switch to preserve visibility for Debug or PLI features, please see the User's Manual section on Preserving Object Visibility with vopt. -novopt option is now deprecated and will be removed in future releases.
+# Loading work.Multiplier
+# Refreshing /home/user/Documents/RV_ISA/Questa/work.Sum
+# ** Warning: (vlog-8891) All optimizations are disabled because the -novopt option is in effect. This will cause your simulation to run very slowly. If you are using this switch to preserve visibility for Debug or PLI features, please see the User's Manual section on Preserving Object Visibility with vopt. -novopt option is now deprecated and will be removed in future releases.
+# Loading work.Sum
+# Refreshing /home/user/Documents/RV_ISA/Questa/work.Multiplier_e
+# ** Warning: (vlog-8891) All optimizations are disabled because the -novopt option is in effect. This will cause your simulation to run very slowly. If you are using this switch to preserve visibility for Debug or PLI features, please see the User's Manual section on Preserving Object Visibility with vopt. -novopt option is now deprecated and will be removed in future releases.
+# Loading work.Multiplier_e
+# Refreshing /home/user/Documents/RV_ISA/Questa/work.Inverse
+# ** Warning: (vlog-8891) All optimizations are disabled because the -novopt option is in effect. This will cause your simulation to run very slowly. If you are using this switch to preserve visibility for Debug or PLI features, please see the User's Manual section on Preserving Object Visibility with vopt. -novopt option is now deprecated and will be removed in future releases.
+# Loading work.Inverse
+# Refreshing /home/user/Documents/RV_ISA/Questa/work.affineTrans
+# ** Warning: (vlog-8891) All optimizations are disabled because the -novopt option is in effect. This will cause your simulation to run very slowly. If you are using this switch to preserve visibility for Debug or PLI features, please see the User's Manual section on Preserving Object Visibility with vopt. -novopt option is now deprecated and will be removed in future releases.
+# Loading work.affineTrans
+# Refreshing /home/user/Documents/RV_ISA/Questa/work.ShiftRow
+# ** Warning: (vlog-8891) All optimizations are disabled because the -novopt option is in effect. This will cause your simulation to run very slowly. If you are using this switch to preserve visibility for Debug or PLI features, please see the User's Manual section on Preserving Object Visibility with vopt. -novopt option is now deprecated and will be removed in future releases.
+# Loading work.ShiftRow
+# Refreshing /home/user/Documents/RV_ISA/Questa/work.MixColumn
+# ** Warning: (vlog-8891) All optimizations are disabled because the -novopt option is in effect. This will cause your simulation to run very slowly. If you are using this switch to preserve visibility for Debug or PLI features, please see the User's Manual section on Preserving Object Visibility with vopt. -novopt option is now deprecated and will be removed in future releases.
+# Loading work.MixColumn
+# Refreshing /home/user/Documents/RV_ISA/Questa/work.AddRoundKey
+# ** Warning: (vlog-8891) All optimizations are disabled because the -novopt option is in effect. This will cause your simulation to run very slowly. If you are using this switch to preserve visibility for Debug or PLI features, please see the User's Manual section on Preserving Object Visibility with vopt. -novopt option is now deprecated and will be removed in future releases.
+# Loading work.AddRoundKey
+# Refreshing /home/user/Documents/RV_ISA/Questa/work.KeySchedule
+# ** Warning: (vlog-8891) All optimizations are disabled because the -novopt option is in effect. This will cause your simulation to run very slowly. If you are using this switch to preserve visibility for Debug or PLI features, please see the User's Manual section on Preserving Object Visibility with vopt. -novopt option is now deprecated and will be removed in future releases.
+# Loading work.KeySchedule
+# Refreshing /home/user/Documents/RV_ISA/Questa/work.FunctionF
+# ** Warning: (vlog-8891) All optimizations are disabled because the -novopt option is in effect. This will cause your simulation to run very slowly. If you are using this switch to preserve visibility for Debug or PLI features, please see the User's Manual section on Preserving Object Visibility with vopt. -novopt option is now deprecated and will be removed in future releases.
+# Loading work.FunctionF
+# Refreshing /home/user/Documents/RV_ISA/Questa/work.FunctionG
+# ** Warning: (vlog-8891) All optimizations are disabled because the -novopt option is in effect. This will cause your simulation to run very slowly. If you are using this switch to preserve visibility for Debug or PLI features, please see the User's Manual section on Preserving Object Visibility with vopt. -novopt option is now deprecated and will be removed in future releases.
+# Loading work.FunctionG
+# Refreshing /home/user/Documents/RV_ISA/Questa/work.XORkey
+# ** Warning: (vlog-8891) All optimizations are disabled because the -novopt option is in effect. This will cause your simulation to run very slowly. If you are using this switch to preserve visibility for Debug or PLI features, please see the User's Manual section on Preserving Object Visibility with vopt. -novopt option is now deprecated and will be removed in future releases.
+# Loading work.XORkey
+# Refreshing /home/user/Documents/RV_ISA/Questa/work.xors
+# ** Warning: (vlog-8891) All optimizations are disabled because the -novopt option is in effect. This will cause your simulation to run very slowly. If you are using this switch to preserve visibility for Debug or PLI features, please see the User's Manual section on Preserving Object Visibility with vopt. -novopt option is now deprecated and will be removed in future releases.
+# Loading work.xors
+# Refreshing /home/user/Documents/RV_ISA/Questa/work.FunctionGXOR
+# ** Warning: (vlog-8891) All optimizations are disabled because the -novopt option is in effect. This will cause your simulation to run very slowly. If you are using this switch to preserve visibility for Debug or PLI features, please see the User's Manual section on Preserving Object Visibility with vopt. -novopt option is now deprecated and will be removed in future releases.
+# Loading work.FunctionGXOR
+add wave  \
+sim:/AESTopTest/plaintext_test \
+sim:/AESTopTest/key_test \
+sim:/AESTopTest/ciphertext_test \
+sim:/AESTopTest/enable \
+sim:/AESTopTest/reset \
+sim:/AESTopTest/busy \
+sim:/AESTopTest/done \
+sim:/AESTopTest/clock \
+sim:/AESTopTest/clock_gated \
+sim:/AESTopTest/counter
+run
+# ** Note: $stop    : /home/user/Documents/RV_ISA/AK/AESCore/tb/AESTopTest.sv(67)
+#    Time: 4010 ns  Iteration: 0  Instance: /AESTopTest
+# Break in Module AESTopTest at /home/user/Documents/RV_ISA/AK/AESCore/tb/AESTopTest.sv line 67
+vsim -quit
+# ** UI-Msg: (vish-3296) Unknown option '-quit'.
+# Use the -help option for complete vsim usage.
+# Error loading design
+vsim -help
+# Questa Sim-64 vsim 2020.2 Simulator 2020.04 Apr 19 2020
+#     The vsim tool provides HDL simulation based on the compiled and optimized
+#     design and it provides various post-simulation analysis capabilities. In
+#     simulation mode it expects to be provided with the optimization output for
+#     the root of the design, or it will automatically produce such an
+#     optimization from the root of the design.
+#     
+#     Try the following to get help on specific options or categories: 
+# 
+#     vsim -help all            : List all categories and options
+#     vsim -help category       : List all categories
+#     vsim -help <option>       : Help on an option
+#     vsim -help <command-line> : Help on all options in a command-line
+#     vsim -help <category>     : List all options in a category
+# 
+#     Category:       The list of categories in vsim tool.
+# 
+#     General         List most common general options
+#     Coverage        List options for Coverage
+#     Cpp             List options supporting SystemC module
+#     Debug           List options for debug, and assertion
+#     GLS             List options for Gate Level Simulation
+#     Language        List all options supported by hardware language Verilog/VHDL
+#     Library         List options for design, work library
+#     License         List options helping for license issues
+#     Messages        List all warn, error, note, fatal messages options
+#     MultiCore       List options supporting for Multicore (MC2)
+#     PA              List most common options supporting for Power Aware
+#     Pdu             List options for Preoptimized Design Unit.
+#     Report          List options for reporting log file, statistics, capstats
+#     Solver          List options supporting for Solver
+#     Visualizer      List options supporting for visualizer
+# quit -sim
+# End time: 17:39:17 on Jul 20,2020, Elapsed time: 0:01:43
+# Errors: 0, Warnings: 4
+quit
