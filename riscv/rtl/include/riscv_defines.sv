@@ -23,6 +23,11 @@
 //                                                                            //
 ////////////////////////////////////////////////////////////////////////////////
 
+////////////////////////////////////////////////////////////////////////////////
+// Engineer: Alenkruth                                                        //
+// Date: 20/07/2020                                                           //
+// Modified to add constants to support crypto operations                     //
+////////////////////////////////////////////////////////////////////////////////
 package riscv_defines;
 
 ////////////////////////////////////////////////
@@ -63,6 +68,9 @@ parameter OPCODE_STORE_POST = 7'h2b;
 parameter OPCODE_PULP_OP    = 7'h5b;
 parameter OPCODE_VECOP      = 7'h57;
 parameter OPCODE_HWLOOP     = 7'h7b;
+
+//Custom Crypto
+parameter OPCODE_CRYPTO     = 7'h77; //This opcode uses the reserved space in the RISC V opcode space.
 
 parameter REGC_S1   = 2'b10;
 parameter REGC_S4   = 2'b00;
