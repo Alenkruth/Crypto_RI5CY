@@ -88,7 +88,7 @@ parameter CRYPTO_AES_CT_WIDTH   = 128;  //ciphertext
 
 // FUNCT6 (OPERATIONS)                                                        //
 parameter CRYPTO_LOADPT        = 6'b000000;
-parameter CRYPTO_LOADKEY       = 6'0000010;
+parameter CRYPTO_LOADKEY       = 6'b000010;
 parameter CRYPTO_STORECT       = 6'b000001;
 parameter CRYPTO_AESENCRYPT    = 6'b000100;
 parameter CRYPTO_AESDECRYPT    = 6'b000101;
