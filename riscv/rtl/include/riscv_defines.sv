@@ -26,7 +26,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 // Engineer: Alenkruth                                                        //
 // Date: 20/07/2020                                                           //
-// Modified to add constants to support crypto operations                     //
+// Add constants required by the crypto extension                             //
 ////////////////////////////////////////////////////////////////////////////////
 package riscv_defines;
 
@@ -69,8 +69,39 @@ parameter OPCODE_PULP_OP    = 7'h5b;
 parameter OPCODE_VECOP      = 7'h57;
 parameter OPCODE_HWLOOP     = 7'h7b;
 
-//Custom Crypto
-parameter OPCODE_CRYPTO     = 7'h77; //This opcode uses the reserved space in the RISC V opcode space.
+////////////////////////////////////////////////////////////////////////////////
+//                           CUSTOM CRYPTO                                    //
+// INSTRUCTION FORMAT                                                         //
+//                                                                            //
+// | FUNCT6 | MEW |  VS2  | RS1/VS1 | WIDTH |  VD  |  OPCODE |                //  
+// 31     26  25   24   20 19     15 14   12 11   7 6       0                 //
+//     6       1      5        5        3       5       7                     //
+////////////////////////////////////////////////////////////////////////////////
+
+// OPCODE                                                                     //
+parameter OPCODE_CRYPTO         = 7'h77; //This opcode uses the reserved space 
+                                         //in the RISC V opcode space.
+// WIDTHS OF OPERANDS (NOT RELATED TO THE INSTRUCTION)                        //
+parameter CRYPTO_AES_KEY_WIDTH  = 255;
+parameter CRYPTO_AES_PT_WIDTH   = 128;  //plaintext
+parameter CRYPTO_AES_CT_WIDTH   = 128;  //ciphertext
+
+// FUNCT6 (OPERATIONS)                                                        //
+parameter CRYPTO_LOADPT        = 6'b000000;
+parameter CRYPTO_LOADKEY       = 6'0000010;
+parameter CRYPTO_STORECT       = 6'b000001;
+parameter CRYPTO_AESENCRYPT    = 6'b000100;
+parameter CRYPTO_AESDECRYPT    = 6'b000101;
+parameter CRYPTO_CLEARREGS     = 6'b111111;
+
+
+// VS1 - VECTOR REGISTER WITH OPERAND 1                                       //
+// RS1 - INTEGER (GP) REGISTER WITH BASE ADDRESS FOR LD/ST                    //
+// VS2 - VECTOR REGISTER WITH OPERAND 2                                       //
+// MEW - BIT USED TO SPECIFY POSSIBILITY OF MISALIGNED VALUES DURING LD/ST    //
+// VD  - DESTINATION VECTOR REGISTER                                          //                                                                            //
+// WIDTH - WIDTH OF THE OPERANDS FOR LD/ST                                    //
+////////////////////////////////////////////////////////////////////////////////
 
 parameter REGC_S1   = 2'b10;
 parameter REGC_S4   = 2'b00;
