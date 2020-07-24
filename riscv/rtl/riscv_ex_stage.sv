@@ -47,7 +47,9 @@ module riscv_ex_stage
   parameter APU_NARGS_CPU    =  3,
   parameter APU_WOP_CPU      =  6,
   parameter APU_NDSFLAGS_CPU = 15,
-  parameter APU_NUSFLAGS_CPU =  5
+  parameter APU_NUSFLAGS_CPU =  5,
+  //////////crypto////////////////
+  parameter CRYPTO           =  0;
 )
 (
   input  logic        clk,
@@ -524,6 +526,28 @@ module riscv_ex_stage
 
    assign apu_busy_o = apu_active;
 
+  ///////////////////////////////////////
+  ///////////////////////////////////////
+  //            CRYPTO                 //
+  ///////////////////////////////////////
+
+  generate 
+    if (CRYPTO == 1) begin
+        aes_AESTop aes
+        ( 
+         .clk_i        (clk     ),
+         .rst_n        (rst_n   ),
+         .en_i         (        ),
+         .plaintext_i  (        ),
+         .key_i        (        ),
+         .ciphertext_o (        ),
+         .done_o       (        ),
+         .busy_o       (        )
+        );
+    end
+    else begin 
+    end
+  endgenerate
   ///////////////////////////////////////
   // EX/WB Pipeline Register           //
   ///////////////////////////////////////
