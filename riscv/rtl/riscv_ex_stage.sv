@@ -49,7 +49,7 @@ module riscv_ex_stage
   parameter APU_NDSFLAGS_CPU = 15,
   parameter APU_NUSFLAGS_CPU =  5,
   //////////crypto////////////////
-  parameter CRYPTO           =  0;
+  parameter CRYPTO           =  0
 )
 (
   input  logic        clk,
