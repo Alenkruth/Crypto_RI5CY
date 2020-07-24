@@ -99,7 +99,7 @@ parameter CRYPTO_CLEARREGS     = 6'b111111;
 // RS1 - INTEGER (GP) REGISTER WITH BASE ADDRESS FOR LD/ST                    //
 // VS2 - VECTOR REGISTER WITH OPERAND 2                                       //
 // MEW - BIT USED TO SPECIFY POSSIBILITY OF MISALIGNED VALUES DURING LD/ST    //
-// VD  - DESTINATION VECTOR REGISTER                                          //                                                                            //
+// VD  - DESTINATION VECTOR REGISTER                                          //
 // WIDTH - WIDTH OF THE OPERANDS FOR LD/ST                                    //
 ////////////////////////////////////////////////////////////////////////////////
 
