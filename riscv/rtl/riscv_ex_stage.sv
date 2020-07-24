@@ -32,6 +32,16 @@
 //                                                                            //
 ////////////////////////////////////////////////////////////////////////////////
 
+////////////////////////////////////////////////////////////////////////////////
+// Engineer:     Alenkruth                                                    //
+// Project:      RISC-V crypto Extension                                      //
+// Modification: Added the AES Core in the EX stage                           //
+////////////////////////////////////////////////////////////////////////////////
+
+////////////////////////////////////////////////////////////////////////////////
+// ToDo: Check if ready needs to stay high for 2 cycles (During Testing)      //
+////////////////////////////////////////////////////////////////////////////////
+
 `include "apu_macros.sv"
 
 import apu_core_package::*;
@@ -115,6 +125,14 @@ module riscv_ex_stage
 
   output logic                        apu_busy_o,
   output logic                        apu_ready_wb_o,
+  
+  // Crypto signals
+  input  logic [127:0] crypto_aes_plaintext_i,
+  input  logic [255:0] crypto_aes_key_i,
+  input  logic crypto_aes_en_i,
+  
+  output logic [127:0] crypto_aes_ciphertext_o,
+  output logic crypto_aes_multicycle_o,
 
   // apu-interconnect
   // handshake signals
@@ -165,6 +183,7 @@ module riscv_ex_stage
   output logic        ex_ready_o, // EX stage ready for new data
   output logic        ex_valid_o, // EX stage gets new data
   input  logic        wb_ready_i  // WB stage ready for new data
+  
 );
 
   logic [31:0]    alu_result;
@@ -182,6 +201,8 @@ module riscv_ex_stage
   logic           fpu_ready;
   logic           fpu_valid;
 
+  // crypto signal
+  logic           crypto_aes_ready;
 
   // APU signals
   logic           apu_valid;
@@ -530,22 +551,29 @@ module riscv_ex_stage
   ///////////////////////////////////////
   //            CRYPTO                 //
   ///////////////////////////////////////
-
+  // Plaintext will come from pipeline registers - ID EX
+  // key will come from pipeline registers - ID EX
+  // enable will come from pipeline registers - ID EX
+  // done will be a part of the ready signal to ID
+  // busy will be part of the valid signal to the LS (crypto_aes_multicycle_o)
+  
   generate 
     if (CRYPTO == 1) begin
         aes_AESTop aes
         ( 
-         .clk_i        (clk     ),
-         .rst_n        (rst_n   ),
-         .en_i         (        ),
-         .plaintext_i  (        ),
-         .key_i        (        ),
-         .ciphertext_o (        ),
-         .done_o       (        ),
-         .busy_o       (        )
+         .clk_i        ( clk                     ),
+         .rst_n        ( rst_n                   ),
+         .en_i         ( crypto_aes_en_i         ),
+         .plaintext_i  ( crypto_aes_plaintext_i  ),
+         .key_i        ( crypto_aes_key_i        ),
+         .ciphertext_o ( crypto_aes_ciphertext_o ),
+         .done_o       ( crypto_aes_ready        ),
+         .busy_o       ( crypto_aes_multicycle_o )
         );
     end
-    else begin 
+    else begin
+        // default values if crypto is no crypto engine is attached 
+        assign crypto_aes_ready = 1'b1;
     end
   endgenerate
   ///////////////////////////////////////
@@ -578,8 +606,8 @@ module riscv_ex_stage
   // to finish branches without going to the WB stage, ex_valid does not
   // depend on ex_ready.
   assign ex_ready_o = (~apu_stall & alu_ready & mult_ready & lsu_ready_ex_i
-                       & wb_ready_i & ~wb_contention & fpu_ready) | (branch_in_ex_i);
-  assign ex_valid_o = (apu_valid | alu_en_i | mult_en_i | csr_access_i | lsu_en_i)
-                       & (alu_ready & mult_ready & lsu_ready_ex_i & wb_ready_i);
+                       & wb_ready_i & ~wb_contention & fpu_ready & crypto_aes_ready) | (branch_in_ex_i);
+  assign ex_valid_o = (apu_valid | alu_en_i | mult_en_i | csr_access_i | lsu_en_i | crypto_aes_en_i)
+                       & (alu_ready & mult_ready & lsu_ready_ex_i & wb_ready_i & crypto_aes_ready);
 
 endmodule
