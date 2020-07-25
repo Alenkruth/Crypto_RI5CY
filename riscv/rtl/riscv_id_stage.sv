@@ -57,7 +57,8 @@ module riscv_id_stage
   parameter APU_NDSFLAGS_CPU  = 15,
   parameter APU_NUSFLAGS_CPU  =  5,
   /////////// CRYPTO //////////////
-  parameter CRYPTO            = 0
+  parameter CRYPTO            = 0,
+  parameter VDATA_WIDTH       = 256
 )
 (
     input  logic        clk,
@@ -375,6 +376,20 @@ module riscv_id_stage
   logic [WAPUTYPE-1:0]        apu_flags_src;
   logic                       apu_stall;
   logic [2:0]                 fp_rnd_mode;
+  
+  // CRYPTO
+  logic [5:0] vregfile_addr_ra_id;
+  logic [5:0] vregfile_addr_rb_id;
+  logic [5:0] vregfile_addr_rc_id;
+  logic [5:0] vregfile_waddr_wb_i;
+  logic [5:0] vregfile_alu_waddr_fw_i;
+  logic vregfile_we_wb_i;
+  logic vregfile_alu_we_fw_i;
+  logic [VDATA_WIDTH-1:0] vregfile_data_ra_id;
+  logic [VDATA_WIDTH-1:0] vregfile_data_rb_id;
+  logic [VDATA_WIDTH-1:0] vregfile_data_rc_id;
+  logic [VDATA_WIDTH-1:0] vregfile_wdata_wb_i;
+  logic [VDATA_WIDTH-1:0] vregfile_alu_wdata_fw_i;
 
   // Register Write Control
   logic        regfile_we_id;
@@ -953,8 +968,7 @@ module riscv_id_stage
     end
   end
 `endif
-
-
+    
   /////////////////////////////////////////////////////////
   //  ____  _____ ____ ___ ____ _____ _____ ____  ____   //
   // |  _ \| ____/ ___|_ _/ ___|_   _| ____|  _ \/ ___|  //
