@@ -29,6 +29,12 @@
 //                                                                            //
 ////////////////////////////////////////////////////////////////////////////////
 
+////////////////////////////////////////////////////////////////////////////////
+// Engineer:     Alenkruth                                                    //
+// Project:      RISC-V crypto Extension                                      //
+// Modification: Modifications to the top module                              //
+////////////////////////////////////////////////////////////////////////////////
+
 import apu_core_package::*;
 
 `include "riscv_config.sv"
@@ -56,7 +62,9 @@ module riscv_core
   parameter APU_WOP_CPU         =  6,
   parameter APU_NDSFLAGS_CPU    = 15,
   parameter APU_NUSFLAGS_CPU    =  5,
-  parameter DM_HaltAddress      = 32'h1A110800
+  parameter DM_HaltAddress      = 32'h1A110800,
+  //////////// crypto  //////////////
+  parameter CRYPTO              = 0
 )
 (
   // Clock and Reset
@@ -198,6 +206,13 @@ module riscv_core
   logic        mult_is_clpx_ex_o;
   logic [ 1:0] mult_clpx_shift_ex;
   logic        mult_clpx_img_ex;
+  
+  // CRPTO
+  logic [255:0] crypto_aes_key_ex;
+  logic [127:0] crypto_aes_plaintext_ex;
+  logic [127:0] crypto_aes_ciphertext_wb;
+  logic         crypto_aes_multicycle;
+  logic         crypto_aes_en_ex;
 
   // FPU
   logic [C_PC-1:0]            fprec_csr;
@@ -763,7 +778,9 @@ module riscv_core
    .APU_NARGS_CPU    ( APU_NARGS_CPU      ),
    .APU_WOP_CPU      ( APU_WOP_CPU        ),
    .APU_NDSFLAGS_CPU ( APU_NDSFLAGS_CPU   ),
-   .APU_NUSFLAGS_CPU ( APU_NUSFLAGS_CPU   )
+   .APU_NUSFLAGS_CPU ( APU_NUSFLAGS_CPU   ),
+   ////////////// CRYPTO ///////////////////
+   .CRYPTO           ( CRYPTO             )
   )
   ex_stage_i
   (
@@ -829,6 +846,14 @@ module riscv_core
     .apu_perf_wb_o              ( perf_apu_wb                  ),
     .apu_ready_wb_o             ( apu_ready_wb                 ),
     .apu_busy_o                 ( apu_busy                     ),
+    
+    // CRYPTO
+    
+    .crypto_aes_plaintext_i     ( crypto_aes_plaintext_ex      ),
+    .crypto_aes_key_i           ( crypto_aes_key_ex            ),
+    .crypto_aes_en_i            ( crypto_aes_en_ex             ),
+    .crypto_aes_ciphertext_o    ( crypto_aes_ciphertext_wb     ),
+    .crypto_aes_multicycle_o    ( crypto_aes_multicycle        ),
 
     // apu-interconnect
     // handshake signals
