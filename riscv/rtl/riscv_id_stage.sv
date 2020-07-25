@@ -55,7 +55,9 @@ module riscv_id_stage
   parameter APU_NARGS_CPU     =  3,
   parameter APU_WOP_CPU       =  6,
   parameter APU_NDSFLAGS_CPU  = 15,
-  parameter APU_NUSFLAGS_CPU  =  5
+  parameter APU_NUSFLAGS_CPU  =  5,
+  /////////// CRYPTO //////////////
+  parameter CRYPTO            = 0
 )
 (
     input  logic        clk,
@@ -966,7 +968,9 @@ module riscv_id_stage
   #(
     .ADDR_WIDTH(6),
     .FPU(FPU),
-    .Zfinx(Zfinx)
+    .Zfinx(Zfinx),
+    /////// CRYPTO //////
+    .CRYPTO(CRYPTO)
   )
   registers_i
   (
@@ -996,16 +1000,40 @@ module riscv_id_stage
     .waddr_b_i          ( regfile_alu_waddr_fw_i ),
     .wdata_b_i          ( regfile_alu_wdata_fw_i ),
     .we_b_i             ( regfile_alu_we_fw_i ),
+    
+    // Crypto extension ports
+    // 3 read ports and 4 write ports
+    // vector Read port a
+    .vraddr_a_i          ( vregfile_addr_ra_id ),
+    .vrdata_a_o          ( vregfile_data_ra_id ),
 
-     // BIST ENABLE
-     .BIST        ( 1'b0                ), // PLEASE CONNECT ME;
+    // vector Read port b
+    .vraddr_b_i          ( vregfile_addr_rb_id ),
+    .vrdata_b_o          ( vregfile_data_rb_id ),
 
-     // BIST ports
-     .CSN_T       (                     ), // PLEASE CONNECT ME; Synthesis will remove me if unconnected
-     .WEN_T       (                     ), // PLEASE CONNECT ME; Synthesis will remove me if unconnected
-     .A_T         (                     ), // PLEASE CONNECT ME; Synthesis will remove me if unconnected
-     .D_T         (                     ), // PLEASE CONNECT ME; Synthesis will remove me if unconnected
-     .Q_T         (                     )
+    // vector Read port c
+    .vraddr_c_i          ( vregfile_addr_rc_id ),
+    .vrdata_c_o          ( vregfile_data_rc_id ),
+
+    // Write port a - For writing back
+    .vwaddr_a_i          ( vregfile_waddr_wb_i ),
+    .vwdata_a_i          ( vregfile_wdata_wb_i ),
+    .vwe_a_i             ( vregfile_we_wb_i    ),
+
+    // Write port b - For forwarding
+    .vwaddr_b_i          ( vregfile_alu_waddr_fw_i ),
+    .vwdata_b_i          ( vregfile_alu_wdata_fw_i ),
+    .vwe_b_i             ( vregfile_alu_we_fw_i ),
+
+    // BIST ENABLE
+    .BIST        ( 1'b0                ), // PLEASE CONNECT ME;
+
+    // BIST ports
+    .CSN_T       (                     ), // PLEASE CONNECT ME; Synthesis will remove me if unconnected
+    .WEN_T       (                     ), // PLEASE CONNECT ME; Synthesis will remove me if unconnected
+    .A_T         (                     ), // PLEASE CONNECT ME; Synthesis will remove me if unconnected
+    .D_T         (                     ), // PLEASE CONNECT ME; Synthesis will remove me if unconnected
+    .Q_T         (                     )
   );
 
 
