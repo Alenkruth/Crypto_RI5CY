@@ -1,10 +1,10 @@
 // Copyright 2015 ETH Zurich and University of Bologna.
 // Copyright and related rights are licensed under the Solderpad Hardware
-// License, Version 0.51 (the “License”); you may not use this file except in
+// License, Version 0.51 (the “License�?); you may not use this file except in
 // compliance with the License.  You may obtain a copy of the License at
 // http://solderpad.org/licenses/SHL-0.51. Unless required by applicable law
 // or agreed to in writing, software, hardware and materials distributed under
-// this License is distributed on an “AS IS” BASIS, WITHOUT WARRANTIES OR
+// this License is distributed on an “AS IS�? BASIS, WITHOUT WARRANTIES OR
 // CONDITIONS OF ANY KIND, either express or implied. See the License for the
 // specific language governing permissions and limitations under the License.
 
@@ -28,16 +28,33 @@
 //                                                                            //
 ////////////////////////////////////////////////////////////////////////////////
 
+////////////////////////////////////////////////////////////////////////////////
+// Engineer:     Alenkruth                                                    //
+// Project:      RISC-V crypto Extension                                      //
+// Modification: add the vector register to the wrap                          //
+////////////////////////////////////////////////////////////////////////////////
+
 //
-// ADDRESS 0 is NOT WRITABLE !!!!!!!!!!!!!!!!!!!!
+// ADDRESS 0 is NOT WRITABLE (INTEGER REGISTER)!!!!!!!!!!!!!!!!!!!!
 //
+
+////////////////////////////////////////////////////////////////////////////////
+// ToDo - 3rd read port and the 2nd write port seem unnecessary as AES needs  //
+//        only 2 inputs and writes back only one value but I am skeptical     //
+//        about removing them, so Check during testing                        //
+//////////////////////////////////////////////////////////////////////////////// 
 
 module register_file_test_wrap
 #(
    parameter ADDR_WIDTH    = 5,
    parameter DATA_WIDTH    = 32,
    parameter FPU           = 0,
-   parameter Zfinx         = 0
+   parameter Zfinx         = 0,
+   /////////crypto/////////////
+   parameter CRYPTO        = 0,
+   parameter VADDR_WIDTH   = 6,
+   parameter VDATA_WIDTH   = 256
+      
 )
 (
    // Clock and Reset
@@ -67,6 +84,30 @@ module register_file_test_wrap
    input  logic [ADDR_WIDTH-1:0]   waddr_b_i,
    input  logic [DATA_WIDTH-1:0]   wdata_b_i,
    input  logic                    we_b_i,
+   
+   // Crypto extension ports
+   // 3 read ports and 4 write ports
+   //Read port VR1
+   input  logic [VADDR_WIDTH-1:0]  vraddr_a_i,
+   output logic [VDATA_WIDTH-1:0]  vrdata_a_o,
+
+   //Read port VR2
+   input  logic [VADDR_WIDTH-1:0]  vraddr_b_i,
+   output logic [VDATA_WIDTH-1:0]  vrdata_b_o,
+
+   //Read port VR3
+   input  logic [VADDR_WIDTH-1:0]  vraddr_c_i,
+   output logic [VDATA_WIDTH-1:0]  vrdata_c_o,
+
+   // Write port VW1
+   input  logic [VADDR_WIDTH-1:0]  vwaddr_a_i,
+   input  logic [VDATA_WIDTH-1:0]  vwdata_a_i,
+   input  logic                    vwe_a_i,
+
+   // Write port VW2
+   input  logic [VADDR_WIDTH-1:0]  vwaddr_b_i,
+   input  logic [VDATA_WIDTH-1:0]  vwdata_b_i,
+   input  logic                    vwe_b_i,
 
    // BIST ENABLE
    input  logic                    BIST,
@@ -160,9 +201,42 @@ module register_file_test_wrap
       .wdata_b_i  ( WriteData_b_muxed   ),
       .we_b_i     ( WriteEnable_b_muxed )
    );
+   
+   generate 
+     if (CRYPTO == 1)begin
+       riscv_vector_register_file_latch 
+       #(
+          .VADDR_WIDTH ( 6                   ),
+          .VDATA_WIDTH ( 256                 )
+       )
+       riscv_vector_register_file_i
+       (
+          .clk         (  clk                ),
+          .rst_n       (  rst_n              ),
+        
+          .test_en_i   ( test_en_i           ),
+      
+          .vraddr_a_i  ( vraddr_a_i          ),
+          .vrdata_a_o  ( vrdata_a_o          ),
 
+          .vraddr_b_i  ( vraddr_b_i          ),
+          .vrdata_b_o  ( vrdata_b_o          ),
 
+          .vraddr_c_i  ( vraddr_c_i          ),
+          .vrdata_c_o  ( vrdata_c_o          ),
 
+          .vwaddr_a_i  ( vwaddr_a_i          ),
+          .vwdata_a_i  ( vwdata_a_i          ),
+          .vwe_a_i     ( vwe_a_i             ),
+
+          .vwaddr_b_i  ( vwaddr_b_i          ),
+          .vwdata_b_i  ( vwdata_b_i          ),
+          .vwe_b_i     ( vwe_b_i             )
+       );
+     end
+     else begin
+     end
+   endgenerate
 
 
 endmodule
