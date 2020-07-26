@@ -39,9 +39,9 @@
 //
 
 ////////////////////////////////////////////////////////////////////////////////
-// ToDo - 3rd read port and the 2nd write port seem unnecessary as AES needs  //
-//        only 2 inputs and writes back only one value but I am skeptical     //
-//        about removing them, so Check during testing                        //
+// ToDo - 3rd read port and the 2nd WB port seem unnecessary as AES needs     //
+//        only 2 inputs and writes to reg only 1 value back (EX->ID).         //
+//        Check during testing                                                //
 //////////////////////////////////////////////////////////////////////////////// 
 
 module register_file_test_wrap
