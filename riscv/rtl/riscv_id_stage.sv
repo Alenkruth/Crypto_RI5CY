@@ -1024,7 +1024,8 @@ module riscv_id_stage
     .FPU(FPU),
     .Zfinx(Zfinx),
     /////// CRYPTO //////
-    .CRYPTO(CRYPTO)
+    .CRYPTO(CRYPTO),
+    .VDATA_WIDTH(VDATA_WIDTH)
   )
   registers_i
   (
