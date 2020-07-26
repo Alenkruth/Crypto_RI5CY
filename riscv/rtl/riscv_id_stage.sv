@@ -1114,7 +1114,7 @@ module riscv_id_stage
       .SHARED_FP_DIVSQRT   ( SHARED_FP_DIVSQRT    ),
       .WAPUTYPE            ( WAPUTYPE             ),
       .APU_WOP_CPU         ( APU_WOP_CPU          ),
-      .CRYPTO              ( CRYPTO               ),
+      .CRYPTO              ( CRYPTO               )
       )
   decoder_i
   (
