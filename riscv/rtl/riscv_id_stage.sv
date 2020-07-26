@@ -27,6 +27,18 @@
 //                                                                            //
 ////////////////////////////////////////////////////////////////////////////////
 
+////////////////////////////////////////////////////////////////////////////////
+// Engineer:     Alenkruth                                                    //
+// Project:      RISC-V crypto Extension                                      //
+// Modification: added features to decode crypto instructions                 //
+////////////////////////////////////////////////////////////////////////////////
+
+////////////////////////////////////////////////////////////////////////////////
+// To-Do         Modify to add load and store of vectors  (immediate)         //
+//               Look if the controller needs to be modified (immediate)      //
+//               Modify to support misaligned vector lengths (extension)      //
+////////////////////////////////////////////////////////////////////////////////
+
 import riscv_defines::*;
 import apu_core_package::*;
 
@@ -151,7 +163,18 @@ module riscv_id_stage
     output logic        mult_is_clpx_ex_o,
     output logic [ 1:0] mult_clpx_shift_ex_o,
     output logic        mult_clpx_img_ex_o,
-
+    
+    // CRYPTO
+    output logic        crypto_en_o,                      // enable for the accelerator
+    output logic [VDATA_WIDTH-1:0] crypto_operand_a_ex_o,   // plaintext/ciphertext
+    output logic [VDATA_WIDTH-1:0] crypto_operand_b_ex_o,   // key
+    output logic        crypto_we_ex_o,                   // indicates the result should be written into register
+    output logic [6:0]  crypto_waddr_o,                   // write back address out !! Unnecessary :-|
+    input  logic [6:0]  crypto_waddr_i,                   // write back address in !! 
+    input  logic        crypto_we_ex_i,                   // enable asserted from ex to write result into the register
+    input  logic [VDATA_WIDTH-1:0] crypto_result_wdata_i, // result
+    output  logic       crypto_ls_instr_o,                // load/store vector instruction
+    
     // APU
     output logic                        apu_en_ex_o,
     output logic [WAPUTYPE-1:0]         apu_type_ex_o,
@@ -378,18 +401,35 @@ module riscv_id_stage
   logic [2:0]                 fp_rnd_mode;
   
   // CRYPTO
-  logic [5:0] vregfile_addr_ra_id;
-  logic [5:0] vregfile_addr_rb_id;
-  logic [5:0] vregfile_addr_rc_id;
-  logic [5:0] vregfile_waddr_wb_i;
-  logic [5:0] vregfile_alu_waddr_fw_i;
-  logic vregfile_we_wb_i;
-  logic vregfile_alu_we_fw_i;
+  logic                   crypto_en;      // from decoder to ID->EX pipe
+  logic [5:0]             vregfile_addr_ra_id;
+  logic [5:0]             vregfile_addr_rb_id;
+  logic [5:0]             vregfile_addr_rc_id;
+  logic [5:0]             vregfile_waddr_wb_i;  // currently unused
+  logic [5:0]             vregfile_alu_waddr_fw_i; // input from the EX stage
+  logic                   vregfile_we_wb_i;
+  logic                   vregfile_alu_we_fw_i; // enable to write the result into the register
   logic [VDATA_WIDTH-1:0] vregfile_data_ra_id;
   logic [VDATA_WIDTH-1:0] vregfile_data_rb_id;
   logic [VDATA_WIDTH-1:0] vregfile_data_rc_id;
-  logic [VDATA_WIDTH-1:0] vregfile_wdata_wb_i;
-  logic [VDATA_WIDTH-1:0] vregfile_alu_wdata_fw_i;
+  logic [VDATA_WIDTH-1:0] vregfile_wdata_wb_i;     // currently unused
+  logic [VDATA_WIDTH-1:0] vregfile_alu_wdata_fw_i; // input from the ex stage
+  logic [6:0]             crypto_waddr;  // wire for the write address
+  logic                   crypto_we_ex; // write back signal from decoder
+  logic                   crypto_ls_instr; //flag to show load/store instruction
+  
+  // CRYPTO
+  
+  assign vregfile_addr_ra_id = CRYPTO ? {1'b0,instr[19:15]} : '0;  // first operand - plaintext/ciphertext
+  assign vregfile_addr_rb_id = CRYPTO ? {1'b0,instr[24:20]} : '0;  // second operand - key
+  
+  assign crypto_waddr = CRYPTO ? {1'b0,instr[11:07]}:'0; // destination register
+  
+  assign crypto_operand_a = CRYPTO ? vregfile_data_ra_id : '0;
+  assign crypto_operand_b = CRYPTO ? vregfile_data_rb_id : '0;
+  
+  assign vregfile_we_wb_i = crypto_we_ex_i;
+  assign vregfile_alu_wdata_fw_i = crypto_result_wdata_i;
 
   // Register Write Control
   logic        regfile_we_id;
@@ -1140,6 +1180,11 @@ module riscv_id_stage
     .mult_imm_mux_o                  ( mult_imm_mux              ),
     .mult_dot_en_o                   ( mult_dot_en               ),
     .mult_dot_signed_o               ( mult_dot_signed           ),
+    
+    // CRYPTO
+    .crypto_en_o                     ( crypto_en                 ),
+    .crypto_ls_instr_o               ( crypto_ls_instr           ),
+    .crypto_we_o                     ( crypto_we                 ),
 
     // FPU / APU signals
     .frm_i                           ( frm_i                     ),
@@ -1478,6 +1523,13 @@ module riscv_id_stage
       mult_is_clpx_ex_o           <= 1'b0;
       mult_clpx_shift_ex_o        <= 2'b0;
       mult_clpx_img_ex_o          <= 1'b0;
+      
+      crypto_operand_a_ex_o       <= '0;
+      crypto_operand_b_ex_o       <= '0;
+      crypto_en_o                 <= 1'b0;
+      crypto_waddr_o              <= '0;
+      crypto_we_ex_o              <= 1'b0;
+      crypto_ls_instr_o           <= 1'b0;
 
       apu_en_ex_o                 <= '0;
       apu_type_ex_o               <= '0;
@@ -1581,7 +1633,22 @@ module riscv_id_stage
           mult_clpx_shift_ex_o      <= instr[14:13];
           mult_clpx_img_ex_o        <= instr[25];
         end
-
+        
+        // CRYPTO
+        if (CRYPTO) begin 
+          crypto_en_o               <= crypto_en;
+          if (crypto_en_o) begin
+              crypto_operand_a_ex_o <= crypto_operand_a;
+              crypto_operand_b_ex_o <= crypto_operand_b;
+              crypto_ls_instr_o     <= crypto_ls_instr;
+          end 
+        end
+        
+        crypto_we_ex_o        <= crypto_we_ex;
+        if (crypto_we_ex) begin
+          crypto_waddr_o        <= crypto_waddr;
+        end
+        
         // APU pipeline
         apu_en_ex_o                 <= apu_en;
         if (apu_en) begin
@@ -1632,6 +1699,8 @@ module riscv_id_stage
         // so we set all write enables to 0, but unstall the pipe
 
         regfile_we_ex_o             <= 1'b0;
+        
+        crypto_we_ex_o              <= 1'b0;
 
         regfile_alu_we_ex_o         <= 1'b0;
 
