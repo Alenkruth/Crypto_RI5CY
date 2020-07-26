@@ -71,7 +71,8 @@ module riscv_core
   parameter APU_NUSFLAGS_CPU    =  5,
   parameter DM_HaltAddress      = 32'h1A110800,
   //////////// crypto  //////////////
-  parameter CRYPTO              = 0
+  parameter CRYPTO              = 0,
+  parameter VDATA_WIDTH         = 256
 )
 (
   // Clock and Reset
@@ -215,11 +216,16 @@ module riscv_core
   logic        mult_clpx_img_ex;
   
   // CRPTO
-  logic [255:0] crypto_aes_key_ex;
-  logic [127:0] crypto_aes_plaintext_ex;
-  logic [127:0] crypto_aes_ciphertext_wb;
-  logic         crypto_aes_multicycle;
-  logic         crypto_aes_en_ex;
+  logic [VDATA_WIDTH-1:0] crypto_aes_key_ex;
+  logic [VDATA_WIDTH-1:0] crypto_aes_plaintext_ex;
+  logic [VDATA_WIDTH-1:0] crypto_aes_ciphertext_wb;
+  logic                   crypto_aes_multicycle;
+  logic                   crypto_aes_en_ex;
+  logic [ 5: 0]           crypto_waddr_id_ex;
+  logic [ 5: 0]           crypto_waddr_ex_id;
+  logic                   crypto_we_id_ex;
+  logic                   crypto_we_ex_id;
+  logic                   crypto_ls_instr;
 
   // FPU
   logic [C_PC-1:0]            fprec_csr;
@@ -575,7 +581,9 @@ module riscv_core
     .APU_NARGS_CPU                ( APU_NARGS_CPU        ),
     .APU_WOP_CPU                  ( APU_WOP_CPU          ),
     .APU_NDSFLAGS_CPU             ( APU_NDSFLAGS_CPU     ),
-    .APU_NUSFLAGS_CPU             ( APU_NUSFLAGS_CPU     )
+    .APU_NUSFLAGS_CPU             ( APU_NUSFLAGS_CPU     ),
+    .CRYPTO                       ( CRYPTO               ),
+    .VDATA_WIDTH                  ( VDATA_WIDTH          )
   )
   id_stage_i
   (
@@ -667,7 +675,20 @@ module riscv_core
     .mult_is_clpx_ex_o            ( mult_is_clpx_ex      ), // from ID to EX stage
     .mult_clpx_shift_ex_o         ( mult_clpx_shift_ex   ), // from ID to EX stage
     .mult_clpx_img_ex_o           ( mult_clpx_img_ex     ), // from ID to EX stage
-
+    
+    // CRYPTO
+    
+    // multicycle is not needed as of now, testing should provide us with details
+    .crypto_en_o                  ( crypto_aes_en_ex         ),
+    .crypto_operand_a_ex_o        ( crypto_aes_plaintext_ex  ),
+    .crypto_operand_b_ex_o        ( crypto_aes_key_ex        ),
+    .crypto_we_ex_o               ( crypto_we_id_ex          ),
+    .crypto_waddr_o               ( crypto_waddr_id_ex       ), // ID -> EX
+    .crypto_waddr_i               ( crypto_waddr_ex_id       ), // EX -> ID
+    .crypto_we_ex_i               ( crypto_we_ex_id          ),
+    .crypto_result_wdata_i        ( crypto_aes_ciphertext_wb ),
+    .crypto_ls_instr_o            ( crypto_ls_instr          ), // to the LSU, hopefully EX would not need it
+    
     // FPU
     .frm_i                        ( frm_csr                 ),
 
@@ -861,6 +882,10 @@ module riscv_core
     .crypto_aes_en_i            ( crypto_aes_en_ex             ),
     .crypto_aes_ciphertext_o    ( crypto_aes_ciphertext_wb     ),
     .crypto_aes_multicycle_o    ( crypto_aes_multicycle        ),
+    .crypto_we_ex_o             ( crypto_we_ex_id              ),
+    .crypto_we_ex_i             ( crypto_we_id_ex              ),
+    .crypto_waddr_i             ( crypto_waddr_id_ex           ),
+    .crypto_waddr_o             ( crypto_waddr_ex_id           ),
 
     // apu-interconnect
     // handshake signals
