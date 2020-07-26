@@ -16,6 +16,7 @@
 // Description:  Regidter file with 32x vector registers. The width is given  //
 //               by the user. This file is developed by using the register    //
 //               file of RI5CY as the base.                                   //
+//               The zeroth register is not fixed to zero value and is RWable //
 ////////////////////////////////////////////////////////////////////////////////
 
 module riscv_vector_register_file_latch
@@ -125,7 +126,7 @@ module riscv_vector_register_file_latch
 
     always_comb
        begin : p_WADa
-          for(i = 1; i < VNUM_TOT_WORDS; i++)
+          for(i = 0; i < VNUM_TOT_WORDS; i++)
             begin : p_WordItera
                if ( (vwe_a_i == 1'b1 ) && (vwaddr_a == i) )
                  vwaddr_onehot_a[i] = 1'b1;
@@ -136,7 +137,7 @@ module riscv_vector_register_file_latch
 
      always_comb
        begin : p_WADb
-          for(j = 1; j < VNUM_TOT_WORDS; j++)
+          for(j = 0; j < VNUM_TOT_WORDS; j++)
             begin : p_WordIterb
                if ( (vwe_b_i == 1'b1 ) && (vwaddr_b == j) )
                  vwaddr_onehot_b[j] = 1'b1;
@@ -170,13 +171,11 @@ module riscv_vector_register_file_latch
    //-- Use active low, i.e. transparent on low latches as storage elements
    //-- Data is sampled on rising clock edge
 
-   // Integer registers
+   // vector registers
    always_latch
      begin : latch_wdata
-        // Note: The assignment has to be done inside this process or Modelsim complains about it
-        mem[0] = '0;
 
-        for(k = 1; k < VNUM_WORDS; k++)
+        for(k = 0; k < VNUM_WORDS; k++)
           begin : w_WordIter
              if(mem_clocks[k] == 1'b1)
                mem[k] = vwaddr_onehot_b_q[k] ? vwdata_b_q : vwdata_a_q;
