@@ -131,6 +131,12 @@ module riscv_ex_stage
   input  logic [VDATA_WIDTH-1:0] crypto_aes_plaintext_i,
   input  logic [VDATA_WIDTH-1:0] crypto_aes_key_i,
   input  logic crypto_aes_en_i,
+  // to ID
+  output logic        crypto_we_ex_o,                   // indicates the result should be written into register 
+  output logic [6:0]  crypto_waddr_o,                   // write back address out !! Unnecessary :-|
+  // from ID
+  input  logic [6:0]  crypto_waddr_i,                   // write back address in !! 
+  input  logic        crypto_we_ex_i,                   // enable asserted from ex to write result into the register
   
   output logic [VDATA_WIDTH-1:0] crypto_aes_ciphertext_o,
   output logic crypto_aes_multicycle_o,
@@ -204,7 +210,6 @@ module riscv_ex_stage
 
   // crypto signal
   logic           crypto_aes_ready;
-  logic           crypto_aes_
 
   // APU signals
   logic           apu_valid;
@@ -374,6 +379,9 @@ module riscv_ex_stage
   
   assign crypto_aes_ciphertext_o = {'0,crypto_aes_ciphertext};
   assign crypto_aes_plaintext    = crypto_aes_plaintext_i[127:0];
+  
+  assign crypto_we_ex_o          =  crypto_we_ex_i;                  
+  assign crypto_waddr_o          =  crypto_waddr_i;                  
   
   generate 
     if (CRYPTO == 1) begin
