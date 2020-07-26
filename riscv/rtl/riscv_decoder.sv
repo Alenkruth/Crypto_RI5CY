@@ -25,6 +25,17 @@
 //                                                                            //
 ////////////////////////////////////////////////////////////////////////////////
 
+////////////////////////////////////////////////////////////////////////////////
+// Engineer:     Alenkruth                                                    //
+// Project:      RISC-V crypto Extension                                      //
+// Modification: added features to decode crypto instructions                 //
+////////////////////////////////////////////////////////////////////////////////
+
+////////////////////////////////////////////////////////////////////////////////
+// ToDo: Add support for Load store instructions                              //
+//       Add clear regs feature                                               //
+////////////////////////////////////////////////////////////////////////////////
+
 `include "apu_macros.sv"
 
 import riscv_defines::*;
@@ -40,7 +51,10 @@ module riscv_decoder
   parameter SHARED_INT_DIV    = 0,
   parameter SHARED_FP_DIVSQRT = 0,
   parameter WAPUTYPE          = 0,
-  parameter APU_WOP_CPU       = 6
+  parameter APU_WOP_CPU       = 6,
+  //////////CRYPTO////////////////
+  parameter CRYPTO            = 0
+  
 )
 (
   // singals running to/from controller
@@ -106,6 +120,11 @@ module riscv_decoder
   output logic        mult_sel_subword_o,      // Select subwords for 16x16 bit of multiplier
   output logic [1:0]  mult_signed_mode_o,      // Multiplication in signed mode
   output logic [1:0]  mult_dot_signed_o,       // Dot product in signed mode
+  
+  // crypto signals
+  output logic crypto_en_o,                    // perform crypto operation
+  output logic crypto_ls_instr_o,              // load/store crypto instruction
+  output logic crypto_we_o,                    // enable write back to registers
 
   // FPU
   input  logic [C_RM-1:0]             frm_i,   // Rounding mode from float CSR
@@ -196,6 +215,9 @@ module riscv_decoder
   logic                      fpu_vec_op; // fpu vectorial operation
   // unittypes for latencies to help us decode for APU
   enum logic[1:0] {ADDMUL, DIVSQRT, NONCOMP, CONV} fp_op_group;
+  
+  //crypto
+  logic crypto_en;
 
 
   /////////////////////////////////////////////
@@ -231,6 +253,10 @@ module riscv_decoder
     mult_signed_mode_o          = 2'b00;
     mult_sel_subword_o          = 1'b0;
     mult_dot_signed_o           = 2'b00;
+    
+    crypto_en_o                 = 1'b0;
+    crypto_ls_instr_o           = 1'b0;
+    crypto_we_o                 = 1'b0;
 
     apu_en                      = 1'b0;
     apu_type_o                  = '0;
@@ -1236,6 +1262,52 @@ module riscv_decoder
             end
           endcase
         end
+      end
+      
+      //////////////////////////////////////////////
+      //////////////////////////////////////////////
+      //////////////////////////////////////////////
+      ///////////////CRYPTO/////////////////////////
+      //////////////////////////////////////////////
+      //////////////////////////////////////////////
+      //////////////////////////////////////////////
+      
+      
+      OPCODE_CRYPTO: begin
+        if (CRYPTO == 1) begin
+          instr_multicycle_o = 1'b1;
+          unique case (instr_rdata_i[31:26])
+            CRYPTO_LOADPT: begin
+              //load the plaintext into registers
+              crypto_ls_instr_o = 1'b1;
+            end
+            CRYPTO_LOADKEY: begin
+              //load the key into registers
+              crypto_ls_instr_o = 1'b1;
+            end
+            CRYPTO_STORECT: begin
+              //load the ciphertext into memory
+              crypto_ls_instr_o = 1'b1;
+            end
+            CRYPTO_AESENCRYPT: begin
+              // encrypt the data
+              crypto_en = 1'b1;
+              crypto_we_o = 1'b1;
+            end
+            CRYPTO_AESDECRYPT: begin
+              // decrypt the data
+              crypto_en = 1'b1;
+              crypto_we_o = 1'b1;
+            end
+            CRYPTO_CLEARREGS: begin
+              // clear the registers
+            end
+            default: illegal_insn_o = 1'b1;
+          endcase          
+        end
+        else begin
+          illegal_insn_o = 1'b1;
+        end 
       end
 
       ////////////////////////////
@@ -2470,6 +2542,8 @@ module riscv_decoder
   assign hwloop_we_o       = (deassert_we_i) ? 3'b0          : hwloop_we;
   assign csr_op_o          = (deassert_we_i) ? CSR_OP_NONE   : csr_op;
   assign jump_in_id_o      = (deassert_we_i) ? BRANCH_NONE   : jump_in_id;
+  //crypto
+  assign crypto_en_o       = (deassert_we_i) ? 1'b0          : crypto_en;
 
   assign jump_in_dec_o         = jump_in_id;
   assign regfile_alu_we_dec_o  = regfile_alu_we;
