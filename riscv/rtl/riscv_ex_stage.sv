@@ -59,7 +59,8 @@ module riscv_ex_stage
   parameter APU_NDSFLAGS_CPU = 15,
   parameter APU_NUSFLAGS_CPU =  5,
   //////////crypto////////////////
-  parameter CRYPTO           =  0
+  parameter CRYPTO           =  0,
+  parameter VDATA_WIDTH      = 256
 )
 (
   input  logic        clk,
@@ -127,11 +128,11 @@ module riscv_ex_stage
   output logic                        apu_ready_wb_o,
   
   // Crypto signals
-  input  logic [127:0] crypto_aes_plaintext_i,
-  input  logic [255:0] crypto_aes_key_i,
+  input  logic [VDATA_WIDTH-1:0] crypto_aes_plaintext_i,
+  input  logic [VDATA_WIDTH-1:0] crypto_aes_key_i,
   input  logic crypto_aes_en_i,
   
-  output logic [127:0] crypto_aes_ciphertext_o,
+  output logic [VDATA_WIDTH-1:0] crypto_aes_ciphertext_o,
   output logic crypto_aes_multicycle_o,
 
   // apu-interconnect
@@ -203,6 +204,7 @@ module riscv_ex_stage
 
   // crypto signal
   logic           crypto_aes_ready;
+  logic           crypto_aes_
 
   // APU signals
   logic           apu_valid;
@@ -357,6 +359,41 @@ module riscv_ex_stage
     .ex_ready_i      ( ex_ready_o           )
   );
 
+  ///////////////////////////////////////
+  ///////////////////////////////////////
+  //            CRYPTO                 //
+  ///////////////////////////////////////
+  // Plaintext will come from pipeline registers - ID EX
+  // key will come from pipeline registers - ID EX
+  // enable will come from pipeline registers - ID EX
+  // done will be a part of the ready signal to ID
+  // busy will be part of the valid signal to the LS (crypto_aes_multicycle_o)
+  
+  logic [127:0] crypto_aes_plaintext;
+  logic [127:0] crypto_aes_ciphertext;
+  
+  assign crypto_aes_ciphertext_o = {'0,crypto_aes_ciphertext};
+  assign crypto_aes_plaintext    = crypto_aes_plaintext_i[127:0];
+  
+  generate 
+    if (CRYPTO == 1) begin
+        aes_AESTop aes
+        ( 
+         .clk_i        ( clk                     ),
+         .rst_n        ( rst_n                   ),
+         .en_i         ( crypto_aes_en_i         ),
+         .plaintext_i  ( crypto_aes_plaintext    ),
+         .key_i        ( crypto_aes_key_i        ),
+         .ciphertext_o ( crypto_aes_ciphertext   ),
+         .done_o       ( crypto_aes_ready        ),
+         .busy_o       ( crypto_aes_multicycle_o )
+        );
+    end
+    else begin
+        // default values if crypto is no crypto engine is attached 
+        assign crypto_aes_ready = 1'b1;
+    end
+  endgenerate
    generate
       if (FPU == 1) begin
          ////////////////////////////////////////////////////
@@ -547,35 +584,6 @@ module riscv_ex_stage
 
    assign apu_busy_o = apu_active;
 
-  ///////////////////////////////////////
-  ///////////////////////////////////////
-  //            CRYPTO                 //
-  ///////////////////////////////////////
-  // Plaintext will come from pipeline registers - ID EX
-  // key will come from pipeline registers - ID EX
-  // enable will come from pipeline registers - ID EX
-  // done will be a part of the ready signal to ID
-  // busy will be part of the valid signal to the LS (crypto_aes_multicycle_o)
-  
-  generate 
-    if (CRYPTO == 1) begin
-        aes_AESTop aes
-        ( 
-         .clk_i        ( clk                     ),
-         .rst_n        ( rst_n                   ),
-         .en_i         ( crypto_aes_en_i         ),
-         .plaintext_i  ( crypto_aes_plaintext_i  ),
-         .key_i        ( crypto_aes_key_i        ),
-         .ciphertext_o ( crypto_aes_ciphertext_o ),
-         .done_o       ( crypto_aes_ready        ),
-         .busy_o       ( crypto_aes_multicycle_o )
-        );
-    end
-    else begin
-        // default values if crypto is no crypto engine is attached 
-        assign crypto_aes_ready = 1'b1;
-    end
-  endgenerate
   ///////////////////////////////////////
   // EX/WB Pipeline Register           //
   ///////////////////////////////////////
