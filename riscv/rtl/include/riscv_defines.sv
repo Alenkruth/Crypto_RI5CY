@@ -73,7 +73,7 @@ parameter OPCODE_HWLOOP     = 7'h7b;
 //                           CUSTOM CRYPTO                                    //
 // INSTRUCTION FORMAT                                                         //
 //                                                                            //
-// | FUNCT6 | MEW |  VS2  | RS1/VS1 | WIDTH |  VD  |  OPCODE |                //  
+// | FUNCT6 | MEW |  CS2  | RS1/CS1 | WIDTH |  CD  |  OPCODE |                //  
 // 31     26  25   24   20 19     15 14   12 11   7 6       0                 //
 //     6       1      5        5        3       5       7                     //
 ////////////////////////////////////////////////////////////////////////////////
