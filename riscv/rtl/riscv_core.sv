@@ -1,4 +1,3 @@
-
 // Copyright 2018 ETH Zurich and University of Bologna.
 // Copyright and related rights are licensed under the Solderpad Hardware
 // License, Version 0.51 (the "License"); you may not use this file except in
@@ -70,7 +69,7 @@ module riscv_core
   parameter APU_NDSFLAGS_CPU    = 15,
   parameter APU_NUSFLAGS_CPU    =  5,
   parameter DM_HaltAddress      = 32'h1A110800,
-  //////////// crypto  //////////////
+  ///////////// crypto  //////////////
   parameter CRYPTO              = 0,
   parameter VDATA_WIDTH         = 256
 )
@@ -101,7 +100,7 @@ module riscv_core
   input  logic        data_gnt_i,
   input  logic        data_rvalid_i,
   output logic        data_we_o,
-  output logic [3:0]  data_be_o,
+  output logic [ 3:0] data_be_o,
   output logic [31:0] data_addr_o,
   output logic [31:0] data_wdata_o,
   input  logic [31:0] data_rdata_i,
